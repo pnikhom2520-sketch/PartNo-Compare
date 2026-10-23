@@ -21,7 +21,10 @@
 
 ## เปิดใช้งาน
 
-ดับเบิลคลิก `index.html` เพื่อเปิดใน Chrome/Edge ได้ทันที หรือเปิดผ่าน web server:
+ออนไลน์ (GitHub Pages): https://pnikhom2520-sketch.github.io/PartNo-Compare/
+— หลังแก้ `config.js` แล้ว `git push` หน้าเว็บจะอัปเดตเองภายใน 1–2 นาที
+
+ในเครื่อง: ดับเบิลคลิก `index.html` เพื่อเปิดใน Chrome/Edge ได้ทันที หรือเปิดผ่าน web server:
 
 ```
 cd C:\Users\Nikhom\PartNo-Compare

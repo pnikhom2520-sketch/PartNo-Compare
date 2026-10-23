@@ -2,6 +2,11 @@ const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.APP_CONFIG;
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = (id) => document.getElementById(id);
+
+if (SUPABASE_URL.includes('YOUR-PROJECT-REF') || SUPABASE_ANON_KEY.startsWith('YOUR-')) {
+  $('login-error').textContent = 'ยังไม่ได้ตั้งค่า Supabase: กรุณาใส่ SUPABASE_URL และ SUPABASE_ANON_KEY ใน config.js';
+  $('login-btn').disabled = true;
+}
 let currentUser = null;
 let pendingNg = null; // { a, b } รอกรอกสาเหตุ
 let lastHistoryRows = [];
