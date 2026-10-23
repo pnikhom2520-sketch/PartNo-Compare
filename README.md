@@ -22,6 +22,12 @@
 4. แนะนำ: **Authentication → Sign In / Providers** ปิด "Allow new users to sign up" เพื่อให้เฉพาะผู้ที่ admin สร้างให้เท่านั้นที่ใช้งานได้
 5. **Project Settings → API** คัดลอก Project URL และ `anon` `public` key ไปใส่ใน `config.js`
 
+## จัดการผู้ใช้ในโปรแกรม (Admin)
+
+1. เปิด `admin.sql` เปลี่ยนรหัสผ่าน `ChangeMe123` แล้วรันใน SQL Editor (ครั้งเดียว) — จะสร้าง User ID `nikhom` (ถ้ายังไม่มี) และตั้งเป็น Admin คนแรก
+2. Log in ด้วยบัญชี Admin จะเห็นแท็บ **จัดการผู้ใช้**: เพิ่มผู้ใช้ (User ID + รหัสผ่าน), รีเซ็ตรหัส, ระงับ/เปิดใช้งาน, ตั้ง/ยกเลิก Admin
+3. ผู้ใช้ที่ถูกระงับจะ log in ไม่ได้ แต่ประวัติการสแกนยังอยู่ครบ
+
 ## เปิดใช้งาน
 
 ออนไลน์ (GitHub Pages): https://pnikhom2520-sketch.github.io/PartNo-Compare/

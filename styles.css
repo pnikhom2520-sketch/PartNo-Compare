@@ -57,6 +57,11 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); b
 .result-box.saving { background: #eef2f7; color: var(--text); font-size: 18px; }
 
 .filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+label.inline { flex-direction: row; align-items: center; gap: 6px; padding-bottom: 8px; }
+.actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.badge.off { background: #e5e7eb; color: var(--muted); }
+.badge.admin { background: #dbeafe; color: var(--primary); }
+.success { color: var(--ok); }
 .table-wrap { overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th, .table td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }

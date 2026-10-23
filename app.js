@@ -62,6 +62,12 @@ async function renderAuth(session) {
     $('user-email').textContent = displayUser(currentUser.email);
     resetScan();
     refreshScanPanel();
+    // ถ้ายังไม่ได้รัน admin.sql ฟังก์ชัน is_admin จะไม่มี => ถือว่าไม่ใช่ Admin
+    const { data: isAdmin } = await sb.rpc('is_admin');
+    $('users-tab-btn').classList.toggle('hidden', !isAdmin);
+  } else {
+    $('users-tab-btn').classList.add('hidden');
+    showTab('scan');
   }
 }
 
@@ -87,13 +93,15 @@ $('logout-btn').addEventListener('click', () => sb.auth.signOut());
 sb.auth.onAuthStateChange((_event, session) => renderAuth(session));
 
 // ---------------------------------------------------------------- tabs
-document.querySelectorAll('.tab').forEach((btn) => btn.addEventListener('click', () => {
-  document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b === btn));
-  $('tab-scan').classList.toggle('hidden', btn.dataset.tab !== 'scan');
-  $('tab-history').classList.toggle('hidden', btn.dataset.tab !== 'history');
-  if (btn.dataset.tab === 'history') loadHistory();
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+  for (const t of ['scan', 'history', 'users']) $(`tab-${t}`).classList.toggle('hidden', t !== name);
+  if (name === 'history') loadHistory();
+  else if (name === 'users') loadUsers();
   else $('scan-a').focus();
-}));
+}
+
+document.querySelectorAll('.tab').forEach((btn) => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
 
 // ---------------------------------------------------------------- scan flow
 function resetScan() {
@@ -274,6 +282,71 @@ $('export-btn').addEventListener('click', () => {
   a.download = `partno-compare-log-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
+});
+
+// ---------------------------------------------------------------- users (Admin)
+function usersMsg(text, ok = false) {
+  $('users-msg').textContent = text;
+  $('users-msg').className = ok ? 'success' : 'error';
+}
+
+async function loadUsers() {
+  const { data, error } = await sb.rpc('admin_list_users');
+  if (error) { usersMsg('โหลดรายชื่อไม่สำเร็จ: ' + error.message); return; }
+  $('users-body').innerHTML = data.map((u) => {
+    const self = u.id === currentUser.id;
+    return `
+    <tr>
+      <td><b>${esc(displayUser(u.email))}</b>${self ? ' <span class="muted">(คุณ)</span>' : ''}</td>
+      <td>${fmtTime(u.created_at)}</td>
+      <td>${u.last_sign_in_at ? fmtTime(u.last_sign_in_at) : '-'}</td>
+      <td><span class="badge ${u.is_active ? 'OK' : 'off'}">${u.is_active ? 'ใช้งาน' : 'ระงับ'}</span></td>
+      <td>${u.is_admin ? '<span class="badge admin">Admin</span>' : 'ผู้ใช้'}</td>
+      <td class="actions">
+        <button class="btn small" data-act="reset" data-id="${u.id}" data-name="${esc(displayUser(u.email))}">รีเซ็ตรหัส</button>
+        ${self ? '' : `
+        <button class="btn small" data-act="active" data-id="${u.id}" data-val="${!u.is_active}">${u.is_active ? 'ระงับ' : 'เปิดใช้งาน'}</button>
+        <button class="btn small" data-act="admin" data-id="${u.id}" data-val="${!u.is_admin}">${u.is_admin ? 'ยกเลิก Admin' : 'ตั้งเป็น Admin'}</button>`}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+$('new-user-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = $('new-user-id').value.trim().toLowerCase();
+  if (id.includes('@')) { usersMsg('ใส่เฉพาะ User ID ไม่ต้องมี @'); return; }
+  $('new-user-btn').disabled = true;
+  const { data: newId, error } = await sb.rpc('admin_create_user', {
+    p_email: userIdToEmail(id),
+    p_password: $('new-user-pw').value,
+  });
+  if (!error && $('new-user-admin').checked) {
+    await sb.rpc('admin_set_admin', { p_user: newId, p_admin: true });
+  }
+  $('new-user-btn').disabled = false;
+  if (error) { usersMsg('เพิ่มผู้ใช้ไม่สำเร็จ: ' + error.message); return; }
+  usersMsg(`เพิ่มผู้ใช้ "${id}" แล้ว`, true);
+  $('new-user-form').reset();
+  loadUsers();
+});
+
+$('users-body').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const { act, id, val, name } = btn.dataset;
+  let res;
+  if (act === 'reset') {
+    const pw = prompt(`รหัสผ่านใหม่ของ "${name}" (อย่างน้อย 6 ตัวอักษร)`);
+    if (!pw) return;
+    res = await sb.rpc('admin_reset_password', { p_user: id, p_password: pw });
+  } else if (act === 'active') {
+    res = await sb.rpc('admin_set_active', { p_user: id, p_active: val === 'true' });
+  } else if (act === 'admin') {
+    res = await sb.rpc('admin_set_admin', { p_user: id, p_admin: val === 'true' });
+  }
+  if (res.error) usersMsg('ไม่สำเร็จ: ' + res.error.message);
+  else { usersMsg('บันทึกแล้ว', true); loadUsers(); }
 });
 
 // ให้ช่องสแกนได้ focus กลับเสมอเมื่อคลิกพื้นที่ว่างในหน้าสแกน (สำหรับใช้กับเครื่องสแกนบาร์โค้ด)
