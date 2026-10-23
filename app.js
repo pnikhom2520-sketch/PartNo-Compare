@@ -1,4 +1,4 @@
-const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.APP_CONFIG;
+const { SUPABASE_URL, SUPABASE_ANON_KEY, USER_DOMAIN = 'partno.local' } = window.APP_CONFIG;
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = (id) => document.getElementById(id);
@@ -21,7 +21,12 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
 
 const fmtTime = (iso) => new Date(iso).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'medium' });
 
-const startOfToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); };
+// Supabase Auth ต้องใช้อีเมล จึงเก็บ User ID เป็น "<userid>@USER_DOMAIN"
+// ถ้าพิมพ์ที่มี @ มา จะใช้เป็นอีเมลตรงๆ (รองรับบัญชีอีเมลเดิม)
+const userIdToEmail = (id) => (id.includes('@') ? id : `${id}@${USER_DOMAIN}`).toLowerCase();
+const displayUser = (email) => String(email ?? '').replace(new RegExp(`@${USER_DOMAIN.replace(/\./g, '\\.')}$`, 'i'), '');
+
+const startOfToday =() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString(); };
 
 let audioCtx;
 function beep(ok) {
@@ -54,7 +59,7 @@ async function renderAuth(session) {
   $('login-view').classList.toggle('hidden', !!currentUser);
   $('app-view').classList.toggle('hidden', !currentUser);
   if (currentUser) {
-    $('user-email').textContent = currentUser.email;
+    $('user-email').textContent = displayUser(currentUser.email);
     resetScan();
     refreshScanPanel();
   }
@@ -65,11 +70,15 @@ $('login-form').addEventListener('submit', async (e) => {
   $('login-error').textContent = '';
   $('login-btn').disabled = true;
   const { error } = await sb.auth.signInWithPassword({
-    email: $('login-email').value.trim(),
+    email: userIdToEmail($('login-user').value.trim()),
     password: $('login-password').value,
   });
   $('login-btn').disabled = false;
-  if (error) $('login-error').textContent = 'เข้าสู่ระบบไม่สำเร็จ: ' + error.message;
+  if (error) {
+    $('login-error').textContent = error.message === 'Invalid login credentials'
+      ? 'User ID หรือรหัสผ่านไม่ถูกต้อง'
+      : 'เข้าสู่ระบบไม่สำเร็จ: ' + error.message;
+  }
   else $('login-password').value = '';
 });
 
@@ -241,7 +250,7 @@ async function loadHistory() {
   $('history-body').innerHTML = data.map((r) => `
     <tr>
       <td>${fmtTime(r.created_at)}</td>
-      <td>${esc(r.user_email)}</td>
+      <td>${esc(displayUser(r.user_email))}</td>
       <td class="mono">${esc(r.part_no_a)}</td>
       <td class="mono">${esc(r.part_no_b)}</td>
       <td><span class="badge ${r.result}">${r.result}</span></td>
@@ -256,7 +265,7 @@ $('export-btn').addEventListener('click', () => {
   const header = ['เวลา', 'ผู้สแกน', 'Part No. ชุดที่ 1', 'Part No. ชุดที่ 2', 'ผล', 'สาเหตุ', 'รายละเอียด'];
   const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const lines = [header, ...lastHistoryRows.map((r) => [
-    fmtTime(r.created_at), r.user_email, r.part_no_a, r.part_no_b, r.result, r.reason_category, r.reason_detail,
+    fmtTime(r.created_at), displayUser(r.user_email),r.part_no_a, r.part_no_b, r.result, r.reason_category, r.reason_detail,
   ])].map((row) => row.map(cell).join(','));
   // ใส่ BOM เพื่อให้ Excel อ่านภาษาไทยได้ถูกต้อง
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });

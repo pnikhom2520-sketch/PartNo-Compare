@@ -15,7 +15,10 @@
 
 1. ไปที่ https://supabase.com/dashboard แล้วสร้าง (หรือเปิด) โปรเจกต์ชื่อ **PartNo-Compare**
 2. **SQL Editor** → New query → วางเนื้อหาจาก `schema.sql` → Run
-3. **Authentication → Users → Add user → Create new user** สร้างบัญชีผู้ใช้งาน (อีเมล + รหัสผ่าน, ติ๊ก Auto Confirm)
+3. **Authentication → Users → Add user → Create new user** สร้างบัญชีผู้ใช้งาน (ติ๊ก Auto Confirm)
+   - Log in ด้วย **User ID**: ใส่ Email เป็น `<userid>@partno.local` เช่น User ID `somchai` → Email `somchai@partno.local`
+   - ยังใช้อีเมลจริง log in ได้ด้วย (พิมพ์อีเมลเต็มในช่อง User ID)
+   - เปลี่ยนโดเมนได้ที่ `USER_DOMAIN` ใน `config.js`
 4. แนะนำ: **Authentication → Sign In / Providers** ปิด "Allow new users to sign up" เพื่อให้เฉพาะผู้ที่ admin สร้างให้เท่านั้นที่ใช้งานได้
 5. **Project Settings → API** คัดลอก Project URL และ `anon` `public` key ไปใส่ใน `config.js`
 
