@@ -31,7 +31,6 @@
       <nav>
         <button class="tab active" data-tab="scan">สแกน</button>
         <button class="tab" data-tab="history">ประวัติ / Log</button>
-        <button class="tab hidden" data-tab="users" id="users-tab-btn">จัดการผู้ใช้</button>
       </nav>
       <div class="user">
         <span id="user-email"></span>
@@ -92,29 +91,6 @@
           <table class="table">
             <thead><tr><th>เวลา</th><th>ผู้สแกน</th><th>ชุดที่ 1</th><th>ชุดที่ 2</th><th>ผล</th><th>สาเหตุ</th><th>รายละเอียด</th></tr></thead>
             <tbody id="history-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </main>
-
-    <!-- ---------- USERS (Admin) ---------- -->
-    <main id="tab-users" class="tab-panel hidden">
-      <div class="card">
-        <h3>เพิ่มผู้ใช้</h3>
-        <form id="new-user-form" class="filters">
-          <label>User ID <input type="text" id="new-user-id" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="เช่น somchai"></label>
-          <label>รหัสผ่าน <input type="text" id="new-user-pw" required minlength="6" autocomplete="off"></label>
-          <label class="inline"><input type="checkbox" id="new-user-admin"> เป็น Admin</label>
-          <button type="submit" id="new-user-btn" class="btn primary">เพิ่มผู้ใช้</button>
-        </form>
-        <p id="users-msg" class="muted"></p>
-      </div>
-      <div class="card">
-        <h3>รายชื่อผู้ใช้</h3>
-        <div class="table-wrap">
-          <table class="table">
-            <thead><tr><th>User ID</th><th>สร้างเมื่อ</th><th>เข้าใช้ล่าสุด</th><th>สถานะ</th><th>สิทธิ์</th><th></th></tr></thead>
-            <tbody id="users-body"></tbody>
           </table>
         </div>
       </div>
