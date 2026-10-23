@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PartNo Compare</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ================= LOGIN ================= -->
+  <section id="login-view" class="center hidden">
+    <form id="login-form" class="card login-card">
+      <h1>PartNo Compare</h1>
+      <p class="muted">ระบบสแกนเปรียบเทียบ Part No. เอกสาร 2 ชุด</p>
+      <label>อีเมล
+        <input type="email" id="login-email" required autocomplete="username">
+      </label>
+      <label>รหัสผ่าน
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </label>
+      <button type="submit" id="login-btn" class="btn primary">เข้าสู่ระบบ</button>
+      <p id="login-error" class="error"></p>
+    </form>
+  </section>
+
+  <!-- ================= APP ================= -->
+  <section id="app-view" class="hidden">
+    <header class="topbar">
+      <strong>PartNo Compare</strong>
+      <nav>
+        <button class="tab active" data-tab="scan">สแกน</button>
+        <button class="tab" data-tab="history">ประวัติ / Log</button>
+      </nav>
+      <div class="user">
+        <span id="user-email"></span>
+        <button id="logout-btn" class="btn small">ออกจากระบบ</button>
+      </div>
+    </header>
+
+    <!-- ---------- SCAN ---------- -->
+    <main id="tab-scan" class="tab-panel">
+      <div class="stats">
+        <div class="stat ok"><span>OK วันนี้ (ของฉัน)</span><b id="stat-ok">0</b></div>
+        <div class="stat ng"><span>NG วันนี้ (ของฉัน)</span><b id="stat-ng">0</b></div>
+      </div>
+
+      <div class="card scan-card">
+        <label class="scan-field">
+          <span class="step">1</span> สแกน Part No. เอกสารชุดที่ 1
+          <input type="text" id="scan-a" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="scan-field">
+          <span class="step">2</span> สแกน Part No. เอกสารชุดที่ 2
+          <input type="text" id="scan-b" autocomplete="off" spellcheck="false" disabled>
+        </label>
+        <div class="row">
+          <button id="reset-btn" class="btn">ล้าง / สแกนใหม่</button>
+        </div>
+        <div id="result-box" class="result-box idle">พร้อมสแกน</div>
+      </div>
+
+      <div class="card">
+        <h3>รายการล่าสุด</h3>
+        <table class="table">
+          <thead><tr><th>เวลา</th><th>ชุดที่ 1</th><th>ชุดที่ 2</th><th>ผล</th><th>สาเหตุ</th></tr></thead>
+          <tbody id="recent-body"></tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- ---------- HISTORY ---------- -->
+    <main id="tab-history" class="tab-panel hidden">
+      <div class="card">
+        <form id="filter-form" class="filters">
+          <label>จากวันที่ <input type="date" id="f-from"></label>
+          <label>ถึงวันที่ <input type="date" id="f-to"></label>
+          <label>ผล
+            <select id="f-result">
+              <option value="">ทั้งหมด</option>
+              <option value="OK">OK</option>
+              <option value="NG">NG</option>
+            </select>
+          </label>
+          <label>ค้นหา Part No. <input type="text" id="f-search"></label>
+          <button type="submit" class="btn primary">ค้นหา</button>
+          <button type="button" id="export-btn" class="btn">Export CSV</button>
+        </form>
+        <p id="history-info" class="muted"></p>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>เวลา</th><th>ผู้สแกน</th><th>ชุดที่ 1</th><th>ชุดที่ 2</th><th>ผล</th><th>สาเหตุ</th><th>รายละเอียด</th></tr></thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- ================= NG REASON MODAL ================= -->
+  <div id="ng-modal" class="modal hidden">
+    <form id="ng-form" class="card modal-card">
+      <h2 class="ng-title">ข้อมูลไม่ตรงกัน (NG)</h2>
+      <div class="compare">
+        <div><span class="muted">ชุดที่ 1</span><b id="ng-a"></b></div>
+        <div><span class="muted">ชุดที่ 2</span><b id="ng-b"></b></div>
+      </div>
+      <label>สาเหตุ <span class="error">*</span>
+        <select id="ng-category" required>
+          <option value="">-- เลือกสาเหตุ --</option>
+          <option>ป้าย/Label ติดผิด</option>
+          <option>เอกสารพิมพ์ผิด</option>
+          <option>หยิบชิ้นงานผิด</option>
+          <option>Revision ไม่ตรงกัน</option>
+          <option>สแกนผิดเอกสาร</option>
+          <option>อื่นๆ</option>
+        </select>
+      </label>
+      <label>รายละเอียดเพิ่มเติม <span id="detail-req" class="error hidden">*</span>
+        <textarea id="ng-detail" rows="3" placeholder="ระบุรายละเอียด / การแก้ไข"></textarea>
+      </label>
+      <button type="submit" id="ng-save-btn" class="btn danger">บันทึก NG</button>
+      <p id="ng-error" class="error"></p>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

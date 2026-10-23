@@ -1,0 +1,74 @@
+:root {
+  --bg: #f3f5f8;
+  --card: #fff;
+  --text: #1d2330;
+  --muted: #6b7280;
+  --border: #dde2ea;
+  --primary: #2563eb;
+  --ok: #16a34a;
+  --ok-bg: #dcfce7;
+  --ng: #dc2626;
+  --ng-bg: #fee2e2;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Tahoma, sans-serif; background: var(--bg); color: var(--text); }
+.hidden { display: none !important; }
+.muted { color: var(--muted); }
+.error { color: var(--ng); min-height: 1em; margin: 0; }
+
+.center { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+.login-card { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
+.login-card h1 { margin: 0; }
+
+label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+input, select, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+.btn { font: inherit; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
+.btn:disabled { opacity: .6; cursor: wait; }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.danger { background: var(--ng); border-color: var(--ng); color: #fff; }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+
+.topbar { display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: #1e293b; color: #fff; flex-wrap: wrap; }
+.topbar nav { display: flex; gap: 4px; flex: 1; }
+.tab { font: inherit; background: none; border: 0; color: #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+.tab.active { background: #334155; color: #fff; }
+.user { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+
+.tab-panel { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.stats { display: flex; gap: 16px; margin-bottom: 16px; }
+.stat { flex: 1; border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+.stat.ok { background: var(--ok-bg); color: var(--ok); }
+.stat.ng { background: var(--ng-bg); color: var(--ng); }
+.stat b { font-size: 28px; }
+
+.scan-card { display: flex; flex-direction: column; gap: 14px; }
+.scan-field { font-size: 16px; font-weight: 600; }
+.scan-field input { font-size: 24px; padding: 12px; font-family: Consolas, monospace; }
+.step { display: inline-flex; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; align-items: center; justify-content: center; font-size: 13px; margin-right: 6px; }
+.row { display: flex; gap: 8px; }
+
+.result-box { text-align: center; font-size: 28px; font-weight: 700; padding: 20px; border-radius: 10px; }
+.result-box.idle { background: #eef2f7; color: var(--muted); font-size: 18px; font-weight: 400; }
+.result-box.ok { background: var(--ok); color: #fff; }
+.result-box.ng { background: var(--ng); color: #fff; }
+.result-box.saving { background: #eef2f7; color: var(--text); font-size: 18px; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th, .table td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); }
+.table th { background: #f8fafc; }
+.table td.mono { font-family: Consolas, monospace; }
+.badge { padding: 2px 8px; border-radius: 10px; font-weight: 600; font-size: 12px; }
+.badge.OK { background: var(--ok-bg); color: var(--ok); }
+.badge.NG { background: var(--ng-bg); color: var(--ng); }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+.modal-card { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
+.ng-title { color: var(--ng); margin: 0; }
+.compare { display: flex; gap: 12px; }
+.compare div { flex: 1; background: var(--ng-bg); padding: 8px 12px; border-radius: 6px; display: flex; flex-direction: column; }
+.compare b { font-family: Consolas, monospace; font-size: 18px; word-break: break-all; }
