@@ -82,9 +82,17 @@ $('login-form').addEventListener('submit', async (e) => {
   else $('login-password').value = '';
 });
 
-$('logout-btn').addEventListener('click', () => sb.auth.signOut());
+$('logout-btn').addEventListener('click', async () => {
+  $('logout-btn').disabled = true;
+  // scope 'local' ลบ session ในเครื่องทันทีโดยไม่ต้องรอเซิร์ฟเวอร์ จึง log out ได้แม้เน็ตมีปัญหา
+  await sb.auth.signOut({ scope: 'local' }).catch(() => {});
+  $('logout-btn').disabled = false;
+  renderAuth(null);
+  $('login-user').focus();
+});
 
-sb.auth.onAuthStateChange((_event, session) => renderAuth(session));
+// ห้ามเรียก Supabase ภายใน callback นี้โดยตรง (อาจค้างเพราะติด auth lock) จึงเลื่อนไปทำหลัง callback จบ
+sb.auth.onAuthStateChange((_event, session) => setTimeout(() => renderAuth(session), 0));
 
 // ---------------------------------------------------------------- tabs
 document.querySelectorAll('.tab').forEach((btn) => btn.addEventListener('click', () => {
